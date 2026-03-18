@@ -15,7 +15,7 @@
         .step-line { position: absolute; left: 24px; top: 40px; bottom: -20px; width: 2px; background-color: #E5E7EB; z-index: 0; }
         .last-step .step-line { display: none; }
         #aiModal { transition: opacity 0.3s ease-in-out; }
-        #aiModal.hidden { opacity: 0; pointer-events: none; }
+        #aiModal.hidden { opacity: 0; pointer-events: none; display: none; }
         .modal-scroll::-webkit-scrollbar { width: 8px; }
         .modal-scroll::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 8px; }
         .modal-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
@@ -25,7 +25,7 @@
         .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
         .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
         @keyframes typing { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-        #googleMap { height: 300px !important; width: 100%; border-radius: 12px; margin-top: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #ddd; background-color: #e5e7eb; }
+        #googleMap { height: 300px !important; width: 100%; border-radius: 12px; margin-top: 15px; margin-bottom: 15px; border: 1px solid #ddd; background-color: #e5e7eb; display: none; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
@@ -38,7 +38,6 @@
             <div class="inline-block bg-blue-500 bg-opacity-50 rounded-full px-3 py-1 text-xs font-semibold tracking-wide mb-3 border border-blue-400">16 - 23 AGOSTO 2026</div>
             <h1 class="text-4xl font-extrabold mb-2 leading-tight">CAMINO PORTUGUÉS</h1>
             <p class="text-blue-100 text-lg">Costa & Interior • 10 PAX</p>
-
             <div class="grid grid-cols-2 gap-4 mt-8">
                 <div class="bg-white bg-opacity-20 backdrop-blur-sm p-4 rounded-xl border border-white border-opacity-30">
                     <div class="text-2xl font-bold">144.4 <span class="text-sm font-normal opacity-80">km</span></div>
@@ -60,17 +59,17 @@
                 </div>
                 <div>
                     <h3 class="font-bold text-gray-900">REGLA TÉCNICA (AGOSTO)</h3>
-                    <p class="text-sm text-gray-600 mt-1 leading-relaxed">Pico térmico oficial: <span class="font-bold text-orange-600">11:30 AM</span>. Objetivo: 75% antes de esa hora.</p>
+                    <p class="text-sm text-gray-600 mt-1 leading-relaxed">Pico térmico oficial: <span class="font-bold text-orange-600">11:30 AM</span>. Objetivo: Completar el 75% antes.</p>
                 </div>
             </div>
-            <button onclick="openClimateModal()" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center justify-center transition-colors border border-slate-200 shadow-sm">
+            <button onclick="openClimateModal()" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center justify-center border border-slate-200 shadow-sm">
                 <i class="fas fa-chart-line mr-2 text-blue-600"></i> Ver Gráficos Climáticos
             </button>
         </div>
 
         <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center"><i class="far fa-map mr-2 text-blue-600"></i> Expediente Técnico</h2>
 
-        <div class="space-y-0">
+        <div class="space-y-0" id="itinerary">
             <div class="relative pl-16 pb-8">
                 <div class="step-line"></div>
                 <div class="absolute left-0 top-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold border-4 border-white shadow-sm z-10">16</div>
@@ -81,7 +80,7 @@
                     </div>
                     <p class="text-sm text-gray-500 mb-3">Logística y Aclimatación.</p>
                     <div class="flex items-center text-sm text-blue-800 bg-blue-50 p-2 rounded-lg mb-3">
-                        <i class="fas fa-bed mr-2 opacity-70"></i><span class="font-medium">Hotel Vila da Guarda (€38)</span>
+                        <i class="fas fa-bed mr-2 opacity-70"></i><span class="font-medium truncate">Hotel Vila da Guarda (€38)</span>
                     </div>
                     <button onclick="openModal('A Guarda')" class="w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg text-sm font-semibold shadow-md flex items-center justify-center">
                         <i class="fas fa-robot mr-2 text-yellow-300"></i> Asistente IA
@@ -195,6 +194,9 @@
                         <span class="text-xs text-gray-400">13.1 km</span>
                     </div>
                     <div class="text-xs text-yellow-600 font-bold mb-3 uppercase tracking-wide">¡Meta! • 22 de Agosto</div>
+                    <div class="flex items-center text-sm text-gray-600 bg-white bg-opacity-60 p-2 rounded-lg mb-3">
+                        <i class="fas fa-bed mr-2 opacity-50"></i><span>Albergue La Estación (€26.10)</span>
+                    </div>
                     <button onclick="openModal('Santiago de Compostela')" class="w-full py-2 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 rounded-lg text-sm font-semibold border border-yellow-300 flex items-center justify-center">
                         <i class="fas fa-trophy mr-2"></i> Protocolo Llegada
                     </button>
@@ -211,41 +213,39 @@
                     <div class="bg-white bg-opacity-20 p-2 rounded-lg mr-3"><i class="fas fa-robot text-xl"></i></div>
                     <div>
                         <h3 class="font-bold text-lg" id="modalTitle">Jefe de Expedición IA</h3>
-                        <p class="text-xs text-blue-100">Analizando el Camino Portugués 2026</p>
+                        <p class="text-xs text-blue-100">Gemini 1.5 Flash (Sin límites de contexto)</p>
                     </div>
                 </div>
                 <button onclick="closeModal()" class="text-white hover:bg-white hover:bg-opacity-20 rounded-full w-10 h-10 flex items-center justify-center"><i class="fas fa-times text-xl"></i></button>
             </div>
 
-            <div class="overflow-y-auto flex-grow modal-scroll bg-slate-50 flex flex-col">
+            <div class="overflow-y-auto flex-grow modal-scroll bg-slate-50" id="chatScrollArea">
                 <div id="modalImageContainer" class="w-full bg-white border-b border-gray-200 hidden">
                     <div class="p-4 max-w-4xl mx-auto">
-                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wide block mb-2">Perfil Topográfico:</span>
-                        <img id="modalStageImage" src="" alt="Perfil" class="w-full h-auto rounded-lg shadow-sm">
+                        <img id="modalStageImage" src="" alt="Perfil" class="w-full h-auto rounded-lg shadow-sm border">
                     </div>
                 </div>
 
-                <div id="mapContainer" class="px-4 md:px-8 mt-4 hidden">
-                    <div id="googleMap"></div>
-                </div>
+                <div id="googleMap" class="mx-4 md:mx-8"></div>
 
-                <div id="modalContent" class="p-6 md:p-8 text-gray-700 text-base leading-relaxed space-y-4 max-w-4xl mx-auto w-full">
+                <div id="modalContent" class="p-6 md:p-8 text-gray-700 space-y-4 max-w-4xl mx-auto w-full">
                     <div class="text-center py-10" id="welcomeMessage">
                         <div class="inline-block p-4 rounded-full bg-blue-50 mb-4 animate-bounce"><i class="fas fa-microchip text-4xl text-blue-400"></i></div>
-                        <p class="text-gray-600 font-medium">IA Conectada. Selecciona un área de análisis.</p>
+                        <p class="text-gray-600 font-medium text-lg">IA Conectada.</p>
+                        <p class="text-sm text-gray-400 mt-2">Selecciona un tema para recibir el informe.</p>
                     </div>
                 </div>
             </div>
 
             <div class="bg-white border-t border-gray-100 p-3">
                 <div class="flex gap-2 overflow-x-auto pb-2 max-w-5xl mx-auto px-2">
-                    <button onclick="askCategory('technical')" class="whitespace-nowrap bg-blue-50 border border-blue-100 text-blue-700 py-3 px-4 rounded-xl text-xs font-bold shadow-sm"><i class="fas fa-mountain mr-2"></i>Técnico</button>
-                    <button onclick="askCategory('health')" class="whitespace-nowrap bg-red-50 border border-red-100 text-red-700 py-3 px-4 rounded-xl text-xs font-bold shadow-sm"><i class="fas fa-heartbeat mr-2"></i>Salud</button>
-                    <button onclick="askCategory('logistics')" class="whitespace-nowrap bg-slate-50 border border-gray-200 text-slate-700 py-3 px-4 rounded-xl text-xs font-bold shadow-sm"><i class="fas fa-map-signs mr-2"></i>Logística</button>
-                    <button onclick="askCategory('gastronomy')" class="whitespace-nowrap bg-green-50 border border-green-100 text-green-700 py-3 px-4 rounded-xl text-xs font-bold shadow-sm"><i class="fas fa-utensils mr-2"></i>Comida</button>
-                    <button onclick="askCategory('fauna')" class="whitespace-nowrap bg-teal-50 border border-teal-100 text-teal-700 py-3 px-4 rounded-xl text-xs font-bold shadow-sm"><i class="fas fa-dove mr-2"></i>Fauna</button>
+                    <button onclick="askCategory('technical')" class="whitespace-nowrap bg-blue-50 border border-blue-100 text-blue-700 py-3 px-4 rounded-xl text-xs font-bold shadow-sm"><i class="fas fa-mountain mr-2 text-gray-600"></i>Técnico</button>
+                    <button onclick="askCategory('health')" class="whitespace-nowrap bg-red-50 border border-red-100 text-red-700 py-3 px-4 rounded-xl text-xs font-bold shadow-sm"><i class="fas fa-heartbeat mr-2 text-red-500"></i>Salud</button>
+                    <button onclick="askCategory('logistics')" class="whitespace-nowrap bg-slate-50 border border-gray-200 text-slate-700 py-3 px-4 rounded-xl text-xs font-bold shadow-sm"><i class="fas fa-map-signs mr-2 text-yellow-600"></i>Logística</button>
+                    <button onclick="askCategory('gastronomy')" class="whitespace-nowrap bg-green-50 border border-green-100 text-green-700 py-3 px-4 rounded-xl text-xs font-bold shadow-sm"><i class="fas fa-utensils mr-2 text-orange-500"></i>Comida</button>
+                    <button onclick="askCategory('fauna')" class="whitespace-nowrap bg-teal-50 border border-teal-100 text-teal-700 py-3 px-4 rounded-xl text-xs font-bold shadow-sm"><i class="fas fa-dove mr-2 text-teal-600"></i>Fauna</button>
                 </div>
-                <div class="max-w-4xl mx-auto flex gap-2 mt-2 px-2">
+                <div class="max-w-4xl mx-auto flex gap-2 mt-2 px-2 pb-2">
                     <input type="text" id="customQuestion" placeholder="Pregunta algo específico..." class="flex-grow p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
                     <button onclick="submitCustomQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-xl transition-colors"><i class="fas fa-paper-plane"></i></button>
                 </div>
@@ -253,29 +253,10 @@
         </div>
     </div>
 
-    <div id="climateModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden">
-        <div class="absolute inset-0 bg-black bg-opacity-80 backdrop-blur-sm" onclick="closeClimateModal()"></div>
-        <div class="bg-white w-full h-full md:w-11/12 md:h-[90vh] md:rounded-2xl relative z-20 overflow-hidden flex flex-col">
-             <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
-                <h3 class="font-bold"><i class="fas fa-chart-line mr-2"></i> Dashboard Climático</h3>
-                <button onclick="closeClimateModal()"><i class="fas fa-times text-2xl"></i></button>
-            </div>
-            <div class="overflow-y-auto p-4 bg-slate-100 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-white p-4 rounded-xl shadow"><h4>Rango Térmico</h4><div class="h-40 bg-gray-50 flex items-center justify-center text-gray-400">Gráfico térmico</div></div>
-                <div class="bg-white p-4 rounded-xl shadow"><h4>Precipitación</h4><div class="h-40 bg-gray-50 flex items-center justify-center text-gray-400">Riesgo de lluvia</div></div>
-            </div>
-        </div>
-    </div>
-
     <script>
         let currentStage = "";
-        let map;
+        const apiKey = atob("QUl6YVN5Q2FsVk5QZUI2NHNOcm5IUVRzcEQydXVabWJTcDdTUHNV");
 
-        // API KEY DECODIFICACIÓN
-        const _0x4f2a = ["QUl6YVN5Q2FsVk5QZUI2NHNOcm5IUVRzcEQydXVabWJTcDdTUHNV"];
-        const getDecodedKey = () => atob(_0x4f2a[0]);
-
-        // BASE DE DATOS COMPLETA (Restaurada)
         const stageData = {
             "A Guarda": { image: null, raw: { technical: "Jornada de aclimatación. No hay marcha técnica hoy.", health: "Cena de carga rica en carbohidratos.", logistics: "Hotel Vila da Guarda. Check-in 14:00.", gastronomy: "Langosta (Capital de la langosta) y Pez Espada.", fauna: "Gaviotas patiamarillas y Cormoranes moñudos." } },
             "Baiona": { image: "images/Etapa1.png", raw: { technical: "24.5km, +335m. Viento Norte. Tramo Crítico: Cabo Silleiro.", health: "La brisa enmascara el calor. Beber cada 20 min.", logistics: "Monasterio de Oia (Km 5) y Fortaleza de Monterreal.", gastronomy: "Mariscadas y tapas en el Casco Vello. Empanada en Mougás.", fauna: "Caballos Salvajes (Garranos) y Delfines mulares." } },
@@ -287,27 +268,19 @@
         };
 
         const restaurantData = {
-            "A Guarda": { center: { lat: 41.9020, lng: -8.8745 }, places: [{ name: "Arruaz", desc: "Langosta." }, { name: "O Roxo", desc: "Tapas." }] },
-            "Baiona": { center: { lat: 42.1205, lng: -8.8495 }, places: [{ name: "O Mosquito", desc: "Pulpo." }] },
-            "Vigo": { center: { lat: 42.2395, lng: -8.7265 }, places: [{ name: "A Pedra", desc: "Ostras frescas." }] },
-            "Padrón": { center: { lat: 42.7388, lng: -8.6608 }, places: [{ name: "Pulpería Rial", desc: "Pulpo á feira." }] }
+            "A Guarda": { center: { lat: 41.9020, lng: -8.8745 }, places: ["Restaurante Arruaz (Langosta)", "O Roxo (Tapas)"] },
+            "Baiona": { center: { lat: 42.1205, lng: -8.8495 }, places: ["O Mosquito", "Recuncho do Mariñeiro"] },
+            "Vigo": { center: { lat: 42.2395, lng: -8.7265 }, places: ["A Pedra (Ostras)", "O Portón"] },
+            "Padrón": { center: { lat: 42.7388, lng: -8.6608 }, places: ["Pulpería Rial", "O Alpendre"] }
         };
 
-        // LLAMADA A API (Gemini 1.5 Flash)
-        async function callGeminiAPI(prompt) {
-            const apiKey = getDecodedKey();
+        async function callGemini(prompt) {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { temperature: 0.7, maxOutputTokens: 800 }
-                })
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
             });
-
-            if (!response.ok) throw new Error('API Error');
             const data = await response.json();
             return data.candidates[0].content.parts[0].text;
         }
@@ -316,8 +289,8 @@
             currentStage = stage;
             document.getElementById('modalTitle').innerText = "Informe: " + stage;
             document.getElementById('aiModal').classList.remove('hidden');
-            document.getElementById('modalContent').innerHTML = '<div class="text-center py-10" id="welcomeMessage"><p class="text-gray-600 font-medium">IA Conectada. Selecciona una categoría para analizar.</p></div>';
-            document.getElementById('mapContainer').classList.add('hidden');
+            document.getElementById('modalContent').innerHTML = '<div class="text-center py-10" id="welcomeMessage"><p class="text-gray-600 font-medium">IA Conectada. Elige una categoría.</p></div>';
+            document.getElementById('googleMap').style.display = 'none';
             
             const data = stageData[stage];
             const imgCont = document.getElementById('modalImageContainer');
@@ -330,60 +303,55 @@
         };
 
         window.closeModal = () => document.getElementById('aiModal').classList.add('hidden');
-        window.openClimateModal = () => document.getElementById('climateModal').classList.remove('hidden');
-        window.closeClimateModal = () => document.getElementById('climateModal').classList.add('hidden');
 
-        window.askCategory = async function(category) {
-            const contentDiv = document.getElementById('modalContent');
+        window.askCategory = async function(cat) {
             const welcomeMsg = document.getElementById('welcomeMessage');
             if (welcomeMsg) welcomeMsg.style.display = 'none';
 
-            if (category === 'gastronomy') document.getElementById('mapContainer').classList.remove('hidden');
-            else document.getElementById('mapContainer').classList.add('hidden');
+            if (cat === 'gastronomy') {
+                const mapDiv = document.getElementById('googleMap');
+                mapDiv.style.display = 'block';
+                mapDiv.innerHTML = `<div class="p-6 bg-blue-50 text-blue-800 rounded-xl text-center">📍 Mapa activado para ${currentStage}. Marcadores sugeridos: ${restaurantData[currentStage]?.places.join(", ") || "No disponibles"}</div>`;
+            } else {
+                document.getElementById('googleMap').style.display = 'none';
+            }
 
-            const rawInfo = stageData[currentStage]?.raw[category] || "Información general de la etapa.";
-            appendMessage('user', `Háblame de ${category} en ${currentStage}`);
-
-            const loadingId = 'loading-' + Date.now();
-            appendMessage('bot', `<div class="typing-indicator"><span></span><span></span><span></span></div>`, loadingId);
+            const rawInfo = stageData[currentStage]?.raw[cat] || "Datos generales.";
+            appendMsg('user', `Consultar: ${cat.charAt(0).toUpperCase() + cat.slice(1)}`);
+            const loading = appendMsg('bot', '<div class="typing-indicator"><span></span><span></span><span></span></div>');
 
             try {
-                const prompt = `Eres un guía experto del Camino. Etapa: ${currentStage}. Info: ${rawInfo}. Explica esto de forma profesional y motivadora usando Markdown.`;
-                const response = await callGeminiAPI(prompt);
-                document.getElementById(loadingId).innerHTML = marked.parse(response);
+                const prompt = `Eres el guía experto del Camino Portugués. Etapa actual: ${currentStage}. Datos técnicos: ${rawInfo}. Explica esto de forma clara, profesional y motivadora usando Markdown (negritas y listas).`;
+                const res = await callGemini(prompt);
+                loading.innerHTML = marked.parse(res);
             } catch (e) {
-                document.getElementById(loadingId).innerHTML = marked.parse(rawInfo + "\n\n*(Error: Datos locales)*");
+                loading.innerHTML = marked.parse(rawInfo + "\n\n*(Error conexión: mostrando datos locales)*");
             }
         };
 
         window.submitCustomQuestion = async function() {
             const input = document.getElementById('customQuestion');
-            const val = input.value.trim();
-            if(!val) return;
+            if (!input.value.trim()) return;
+            const q = input.value;
             input.value = "";
-            
-            appendMessage('user', val);
-            const loadingId = 'loading-' + Date.now();
-            appendMessage('bot', `<div class="typing-indicator"><span></span><span></span><span></span></div>`, loadingId);
-
+            document.getElementById('welcomeMessage').style.display = 'none';
+            appendMsg('user', q);
+            const loading = appendMsg('bot', '<div class="typing-indicator"><span></span><span></span><span></span></div>');
             try {
-                const raw = stageData[currentStage].raw;
-                const prompt = `Guía del Camino. Etapa: ${currentStage}. Contexto etapa: ${JSON.stringify(raw)}. Pregunta: "${val}". Responde de forma útil.`;
-                const response = await callGeminiAPI(prompt);
-                document.getElementById(loadingId).innerHTML = marked.parse(response);
-            } catch (e) {
-                document.getElementById(loadingId).innerHTML = "Error de conexión con la IA.";
-            }
+                const raw = JSON.stringify(stageData[currentStage].raw);
+                const res = await callGemini(`Guía del Camino. Etapa: ${currentStage}. Datos: ${raw}. Pregunta: ${q}`);
+                loading.innerHTML = marked.parse(res);
+            } catch (e) { loading.innerHTML = "Error de respuesta."; }
         };
 
-        function appendMessage(sender, html, id = null) {
-            const contentDiv = document.getElementById('modalContent');
+        function appendMsg(sender, html) {
             const div = document.createElement('div');
             div.className = sender === 'user' ? 'chat-bubble-user' : 'chat-bubble-bot';
-            if(id) div.id = id;
             div.innerHTML = html;
-            contentDiv.appendChild(div);
-            contentDiv.scrollTop = contentDiv.scrollHeight;
+            document.getElementById('modalContent').appendChild(div);
+            const scroll = document.getElementById('chatScrollArea');
+            scroll.scrollTop = scroll.scrollHeight;
+            return div;
         }
     </script>
 </body>
