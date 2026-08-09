@@ -3,66 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Ruta en España - Satélite y Perfil de Elevación</title>
+    <title>Mi Camino de Santiago - Estilo GPX Studio</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Leaflet Elevation CSS (Diseño del gráfico) -->
+    <!-- Leaflet Elevation CSS (Estilo moderno y limpio) -->
     <link rel="stylesheet" href="https://unpkg.com/@raruto/leaflet-elevation@2.5.1/dist/leaflet-elevation.min.css" />
     
     <style>
-        body {
+        body, html {
             margin: 0;
             padding: 0;
-            font-family: sans-serif;
-            background-color: #1a1a1a;
-            color: #fff;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #121212;
         }
-        header {
-            background: #111;
-            padding: 0.6rem;
-            text-align: center;
-            border-bottom: 2px solid #333;
-        }
-        header h2 {
-            margin: 0;
-            font-size: 1.2rem;
-        }
-        /* Contenedor del mapa (ocupa el 60% de la altura) */
+        /* El mapa ocupa toda la pantalla de fondo */
         #map {
             width: 100%;
-            height: 60vh;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
-        /* Contenedor independiente para el perfil de altitud (ocupa el 30%) */
-        #elevation-div {
-            width: 100%;
-            height: 30vh;
-            background: #111;
+        /* Personalización de los popups de las etapas (waypoints) para que sean elegantes */
+        .leaflet-popup-content-wrapper {
+            background: #222;
+            color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
-        .info {
-            padding: 0.4rem;
-            text-align: center;
-            font-size: 0.8rem;
-            color: #888;
-            background: #0d0d0d;
+        .leaflet-popup-tip {
+            background: #222;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h2>Ruta por España (Satélite + Perfil de Altitud)</h2>
-    </header>
-
-    <!-- Mapa -->
+    <!-- Contenedor del mapa -->
     <div id="map"></div>
-    
-    <!-- Gráfico de Elevación -->
-    <div id="elevation-div"></div>
-    
-    <div class="info">
-        <p>💡 Pasa el ratón sobre el gráfico de abajo para ver la ubicación exacta sobre el mapa de satélite.</p>
-    </div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -70,47 +51,72 @@
     <script src="https://unpkg.com/@raruto/leaflet-elevation@2.5.1/dist/leaflet-elevation.min.js"></script>
 
     <script>
-        // 1. Inicializar el mapa centrado en España con zoom general inicial
+        // 1. Inicializar el mapa centrado en España
         var map = L.map('map', {
-            center: [40.4168, -3.7038],
-            zoom: 6,
+            center: [42.5, -8.0], // Coordenadas orientativas hacia el norte/camino en España
+            zoom: 7,
             zoomControl: true
         });
 
-        // 2. Capa de mapa de satélite de alta resolución (Esri World Imagery)
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        // 2. Capa base de Satélite de alta calidad (Esri World Imagery)
+        var satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 19,
             attribution: 'Tiles &copy; Esri'
         }).addTo(map);
 
-        // Capa de etiquetas de poblaciones y carreteras sobre el satélite
-        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+        // Capa de etiquetas de carreteras y poblaciones superpuesta al satélite
+        var labelsLayer = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 19
         }).addTo(map);
 
-        // 3. Configurar el control de elevación (idéntico concepto a gpx.studio)
+        // 3. Configuración avanzada del panel de elevación estilo gpx.studio
         var controlElevation = L.control.elevation({
-            theme: "dark-theme",     // Tema oscuro para que combine con el fondo
-            detached: true,          // Separa el gráfico del mapa para colocarlo en su propio div
-            elevationDiv: "#elevation-div", // ID del contenedor HTML creado arriba
-            followMarker: true,      // Sigue el punto en el mapa al interactuar con el gráfico
+            theme: "elevation-theme-modern", // Estilo limpio y plano
+            detached: true,                  // Panel flotante inferior idéntico a gpx.studio
+            elevationDiv: "#elevation-div",  // Se crea automáticamente si no existe
+            followMarker: true,              // Sincronización ratón-mapa
             autohide: false,
-            summary: true,           // Muestra totales de distancia y desnivel
+            summary: "inline",               // Muestra resumen de datos (desniveles, distancias)
+            legend: true,                    // Muestra la leyenda de colores por pendiente
+            speed: true,
+            slope: "grade",
+            waypoints: true,                 // Habilita la lectura de Waypoints (etapas)
+            trk: true,                       // Habilita los Tracks principales
+            rt: true,                        // Habilita Routes
+            pts: false,                      // 🚫 FUERZA A OCULTAR LOS TRACK-POINTS individuales
             gpxOptions: {
                 polyline_options: {
-                    color: '#ff0055', // Color fucsia brillante para destacar sobre el satélite
-                    weight: 4,
-                    opacity: 0.85
+                    weight: 5,
+                    opacity: 0.9,
+                    lineCap: 'round'
+                },
+                marker_options: {
+                    startIcon: null,         // Oculta iconos predeterminados feos para usar los limpios
+                    endIcon: null,
+                    wptIcon: L.divIcon({     // Estilo elegante tipo punto de etapa para tus Waypoints
+                        className: 'custom-waypoint-icon',
+                        html: '<div style="background-color: #3b82f6; width: 14px; height: 14px; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.6);"></div>',
+                        iconSize: [14, 14],
+                        iconAnchor: [7, 7]
+                    })
                 }
             }
         });
 
-        // Añadir el control de elevación al mapa
         controlElevation.addTo(map);
 
-        // 4. Cargar automáticamente el archivo GPX (asegúrate de que se llama 'ruta.gpx' en tu repositorio)
+        // 4. Cargar el archivo GPX aplicando el coloreado por pendiente de dificultad
         controlElevation.load("ruta.gpx");
-    </script>
 
+        // Estilo dinámico inyectado para colorear la traza según la dificultad/pendiente (Estilo gpx.studio)
+        var cssGpxStudio = document.createElement("style");
+        cssGpxStudio.innerHTML = `
+            .elevation-polyline {
+                stroke-linecap: round;
+            }
+        `;
+        document.head.appendChild(cssGpxStudio);
+
+    </script>
 </body>
 </html>
