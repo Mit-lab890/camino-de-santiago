@@ -3,6 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Ruta - Estilo GPX Studio</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet Elevation CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/@raruto/leaflet-elevation@2.5.1/dist/leaflet-elevation.min.css" />
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0b0f19;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        /* Contenedor superior para el mapa */
+        #map {
+            width: 100%;
+            height: 70vh;
+        }
+        /* Contenedor inferior para el perfil de elevación (Fondo negro y elegante) */
+        #elevation-div {
+            width: 100%;
+            height: 30vh;
+            background-color: #121212;
+            border-top: 1px solid #2a2a2a;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Mapa -->
+    <div id="map"></div>
+    
+    <!-- Panel de Elevación -->
+    <div id="elevation-div"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet Elevation JS -->
+    <script src="https://unpkg.com/@raruto/leaflet-elevation@2.5.1/dist/leaflet-elevation.min.js"></script>
+
+    <script>
+        // 1. Inicializar el mapa
+        var map = L.map('map', {
+            center: [42.5, -8.0],
+            zoom: 7
+        });
+
+        // 2. Capa de Satélite (Esri World Imagery)
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19,
+            attribution: 'Tiles &copy; Esri'
+        }).addTo(map);
+
+        // Capa de etiquetas de poblaciones sobre el satélite
+        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19
+        }).addTo(map);
+
+        // 3. Configuración del panel de elevación
+        var controlElevation = L.control.elevation({
+            theme: "dark-theme",
+            detached: true,
+            elevationDiv: "#elevation-div",
+            followMarker: true,
+            autohide: false,
+            summary: true,
+            legend: true,
+            waypoints: true,
+            trk: true,
+            pts: false, // Oculta los track-points individuales
+            gpxOptions: {
+                polyline_options: {
+                    weight: 4,
+                    opacity: 0.9,
+                    lineCap: 'round'
+                },
+                marker_options: {
+                    startIcon: null,
+                    endIcon: null,
+                    point_icon: null,
+                    wptIcon: L.divIcon({
+                        className: 'custom-waypoint',
+                        html: '<div style="background-color: #3b82f6; width: 14px; height: 14px; border: 2px solid #ffffff; border-radius: 50%; box-shadow: 0 0 6px rgba(0,0,0,0.7);"></div>',
+                        iconSize: [14, 14],
+                        iconAnchor: [7, 7]
+                    })
+                }
+            }
+        });
+
+        controlElevation.addTo(map);
+
+        // 4. Cargar el archivo GPX
+        controlElevation.load("ruta.gpx");
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camino de Santiago 2026/title>
     
     <!-- Leaflet CSS -->
