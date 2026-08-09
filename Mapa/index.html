@@ -5,222 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camino de Santiago 2026</title>
     
-    <!-- Leaflet CSS -->
+    <!-- Librerías Externas CSS (Leaflet y FontAwesome) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Leaflet Elevation CSS -->
     <link rel="stylesheet" href="https://unpkg.com/@raruto/leaflet-elevation@2.5.1/dist/leaflet-elevation.min.css" />
-    <!-- Font Awesome para los iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     
-    <style>
-        :root {
-            --primary: #3b82f6; /* Color azul estilo Camino de Santiago */
-            --bg-dark: #121212;
-            --bg-panel: rgba(30, 30, 30, 0.85);
-            --text-light: #ffffff;
-        }
-
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
-        }
-
-        /* Contenedor del mapa a pantalla completa */
-        #map {
-            width: 100vw;
-            height: 100vh;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-
-        /* Barra de herramientas flotante estilo gpx.studio */
-        .toolbar {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .btn-tool {
-            background-color: var(--bg-panel);
-            color: var(--text-light);
-            border: 1px solid #333;
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-        }
-
-        .btn-tool:hover {
-            background-color: var(--primary);
-            border-color: var(--primary);
-            transform: scale(1.05);
-        }
-
-        /* Título flotante */
-        .map-title {
-            position: absolute;
-            top: 20px;
-            left: 50px;
-            z-index: 1000;
-            background: var(--bg-panel);
-            padding: 10px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-            backdrop-filter: blur(5px);
-            border: 1px solid #333;
-            pointer-events: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-        }
-
-        /* Contenedor inferior retráctil para la elevación */
-        #elevation-container {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 35vh;
-            background-color: var(--bg-dark);
-            z-index: 999;
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            border-top: 2px solid var(--primary);
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
-        }
-
-        #elevation-container.active {
-            transform: translateY(0);
-        }
-
-        #elevation-div {
-            height: 100%;
-            width: 100%;
-        }
-
-        .close-panel-btn {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            background: none;
-            border: none;
-            color: #aaa;
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 1001;
-            transition: color 0.2s;
-        }
-
-        .close-panel-btn:hover {
-            color: white;
-        }
-
-        /* Ventana modal del equipo */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
-            z-index: 2000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .team-modal {
-            background: #1e1e1e;
-            padding: 30px;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 500px;
-            color: white;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            border: 1px solid #333;
-            position: relative;
-            transform: scale(0.95);
-            transition: transform 0.3s ease;
-        }
-
-        .modal-overlay.active .team-modal {
-            transform: scale(1);
-        }
-
-        .team-modal h2 {
-            margin-top: 0;
-            text-align: center;
-            color: var(--primary);
-            font-weight: 600;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .team-member {
-            background: #2a2a2a;
-            padding: 12px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 500;
-            transition: background 0.2s, transform 0.2s;
-        }
-
-        .team-member:hover {
-            background: #333;
-            transform: translateX(5px);
-        }
-
-        .member-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 16px;
-            color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-    </style>
+    <!-- Tus Estilos -->
+    <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
 
@@ -232,15 +23,17 @@
     <!-- Mapa a pantalla completa -->
     <div id="map"></div>
     
-    <!-- Botones flotantes (estilo gpx.studio) -->
+    <!-- Botones flotantes -->
     <div class="toolbar">
-        <!-- Botón para el perfil de elevación -->
         <button class="btn-tool" id="btn-elevation" title="Ver Perfil de Elevación">
             <i class="fa-solid fa-chart-area"></i>
         </button>
-        <!-- Botón para ver a los integrantes -->
         <button class="btn-tool" id="btn-team" title="Ver Integrantes">
             <i class="fa-solid fa-users"></i>
+        </button>
+        <!-- Dejo preparado un botón para el futuro feedback -->
+        <button class="btn-tool" id="btn-feedback" title="Añadir Feedback" style="display: none;">
+            <i class="fa-solid fa-comment-dots"></i>
         </button>
     </div>
 
@@ -260,137 +53,18 @@
             </button>
             <h2><i class="fa-solid fa-shoe-prints"></i> Los 8 Peregrinos</h2>
             <div class="team-grid" id="team-grid">
-                <!-- Se rellena por JavaScript -->
+                <!-- Se rellena automáticamente por JavaScript -->
             </div>
         </div>
     </div>
 
-    <!-- Leaflet JS -->
+    <!-- Librerías Externas JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Leaflet Elevation JS -->
     <script src="https://unpkg.com/@raruto/leaflet-elevation@2.5.1/dist/leaflet-elevation.min.js"></script>
 
-    <script>
-        // --- 1. CONFIGURACIÓN DEL MAPA ---
-        var map = L.map('map', {
-            center: [42.5, -8.0], // Centro aproximado del final del Camino
-            zoom: 8,
-            zoomControl: false // Ocultamos el default para mantenerlo limpio (opcional)
-        });
-
-        // Reposicionar el control de zoom si lo quieres (abajo a la derecha)
-        L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-        // Capa de Satélite (Esri World Imagery)
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 19,
-            attribution: 'Tiles &copy; Esri'
-        }).addTo(map);
-
-        // Capa de etiquetas de poblaciones
-        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 19
-        }).addTo(map);
-
-
-        // --- 2. CONFIGURACIÓN DE LA ELEVACIÓN ---
-        var controlElevation = L.control.elevation({
-            theme: "dark-theme",
-            detached: true,
-            elevationDiv: "#elevation-div",
-            followMarker: true,
-            autohide: false,
-            summary: true,
-            legend: false, // Mejor ocultar la leyenda para mantenerlo limpio
-            waypoints: true,
-            trk: true,
-            pts: false,
-            gpxOptions: {
-                polyline_options: {
-                    weight: 5, // Línea un poco más gruesa
-                    color: '#3b82f6', // Color azul que resalta sobre el satélite
-                    opacity: 0.9,
-                    lineCap: 'round',
-                    lineJoin: 'round'
-                },
-                marker_options: {
-                    startIcon: null,
-                    endIcon: null,
-                    point_icon: null,
-                    wptIcon: L.divIcon({
-                        className: 'custom-waypoint',
-                        html: '<div style="background-color: #ffaa00; width: 14px; height: 14px; border: 2px solid #ffffff; border-radius: 50%; box-shadow: 0 0 6px rgba(0,0,0,0.7);"></div>',
-                        iconSize: [14, 14],
-                        iconAnchor: [7, 7]
-                    })
-                }
-            }
-        });
-
-        controlElevation.addTo(map);
-
-        // Cargar el archivo GPX (Reemplaza con tu archivo real)
-        controlElevation.load("ruta.gpx");
-
-
-        // --- 3. LÓGICA DE INTERFAZ (BOTONES, ELEVACIÓN Y EQUIPO) ---
-        
-        // Elementos del DOM
-        const btnElevation = document.getElementById('btn-elevation');
-        const containerElevation = document.getElementById('elevation-container');
-        const closeElevation = document.getElementById('close-elevation');
-
-        const btnTeam = document.getElementById('btn-team');
-        const overlayTeam = document.getElementById('team-overlay');
-        const closeTeam = document.getElementById('close-team');
-
-        // Toggle del perfil de elevación
-        function toggleElevationPanel() {
-            containerElevation.classList.toggle('active');
-            // Le damos tiempo a que la animación de CSS termine y forzamos redibujado de la gráfica
-            setTimeout(() => {
-                window.dispatchEvent(new Event('resize'));
-            }, 400);
-        }
-
-        btnElevation.addEventListener('click', toggleElevationPanel);
-        closeElevation.addEventListener('click', () => containerElevation.classList.remove('active'));
-
-        // Toggle del modal de los integrantes
-        btnTeam.addEventListener('click', () => {
-            overlayTeam.classList.add('active');
-        });
-        
-        closeTeam.addEventListener('click', () => {
-            overlayTeam.classList.remove('active');
-        });
-
-        // Cerrar modal del equipo al hacer clic fuera del recuadro
-        overlayTeam.addEventListener('click', (e) => {
-            if (e.target === overlayTeam) {
-                overlayTeam.classList.remove('active');
-            }
-        });
-
-        // --- 4. GENERAR LOS INTEGRANTES DINÁMICAMENTE ---
-        const integrantes = ["María", "Mario", "Irene", "Carlota", "Carmen", "Santi", "Alejo", "Andrés"];
-        const gridTeam = document.getElementById('team-grid');
-
-        // Colores aleatorios o variados para los avatares (Opcional, hace que se vea más animado)
-        const colores = ['#ef4444', '#f97316', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f43f5e'];
-
-        integrantes.forEach((nombre, index) => {
-            const inicial = nombre.charAt(0);
-            const colorFondo = colores[index % colores.length];
-            
-            const htmlMiembro = `
-                <div class="team-member">
-                    <div class="member-avatar" style="background-color: ${colorFondo};">${inicial}</div>
-                    <span>${nombre}</span>
-                </div>
-            `;
-            gridTeam.innerHTML += htmlMiembro;
-        });
-    </script>
+    <!-- Tus Scripts -->
+    <!-- <script src="js/db.js"></script> Lo activaremos cuando pongamos Firebase -->
+    <script src="js/main.js"></script>
+    
 </body>
 </html>
