@@ -31,10 +31,6 @@
         <button class="btn-tool" id="btn-team" title="Ver Integrantes">
             <i class="fa-solid fa-users"></i>
         </button>
-        <!-- Dejo preparado un botón para el futuro feedback -->
-        <button class="btn-tool" id="btn-feedback" title="Añadir Feedback" style="display: none;">
-            <i class="fa-solid fa-comment-dots"></i>
-        </button>
     </div>
 
     <!-- Panel Retráctil de Elevación -->
@@ -57,44 +53,12 @@
             </div>
         </div>
     </div>
-    
-    <!-- Modal de Feedback (Diario del Camino) -->
-    <div class="modal-overlay" id="feedback-overlay">
-    <div class="team-modal">
-        <button class="close-panel-btn" id="close-feedback" style="top: 15px; right: 15px;" title="Cerrar">
-            <i class="fa-solid fa-times"></i>
-        </button>
-        <h2><i class="fa-solid fa-book-open"></i> Diario de Etapa</h2>
-        
-        <form id="form-feedback" class="feedback-form">
-            <select id="fb-autor" required>
-                <option value="" disabled selected>¿Quién eres?</option>
-                <option value="María">María</option>
-                <option value="Mario">Mario</option>
-                <option value="Irene">Irene</option>
-                <option value="Carlota">Carlota</option>
-                <option value="Carmen">Carmen</option>
-                <option value="Santi">Santi</option>
-                <option value="Alejo">Alejo</option>
-                <option value="Andrés">Andrés</option>
-            </select>
-
-            <input type="text" id="fb-etapa" placeholder="Ej: Etapa 3 - Arzúa" required>
-            
-            <textarea id="fb-comentario" placeholder="¿Qué tal fue la etapa de hoy? Anécdotas, dolores, paisajes..." rows="4" required></textarea>
-            
-            <button type="submit" class="btn-submit">Guardar Recuerdo</button>
-        </form>
-    </div>
-</div>
 
     <!-- Librerías Externas JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/@raruto/leaflet-elevation@2.5.1/dist/leaflet-elevation.min.js"></script>
 
     <!-- Tus Scripts -->
-    <!-- <script src="js/db.js"></script> Lo activaremos cuando pongamos Firebase -->
-    <script type="module" src="js/db.js"></script>
     <script src="js/main.js"></script>
     
 </body>
