@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Ruta en España - Satélite</title>
+    <title>Mi Ruta en España - Satélite y Perfil de Elevación</title>
     
-    <!-- Estilos de Leaflet -->
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet Elevation CSS (Diseño del gráfico) -->
+    <link rel="stylesheet" href="https://unpkg.com/@raruto/leaflet-elevation@2.5.1/dist/leaflet-elevation.min.css" />
     
     <style>
         body {
@@ -18,75 +20,96 @@
         }
         header {
             background: #111;
-            padding: 0.8rem;
+            padding: 0.6rem;
             text-align: center;
             border-bottom: 2px solid #333;
         }
-        /* Contenedor del mapa */
+        header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        /* Contenedor del mapa (ocupa el 60% de la altura) */
         #map {
             width: 100%;
-            height: 80vh;
+            height: 60vh;
+        }
+        /* Contenedor independiente para el perfil de altitud (ocupa el 30%) */
+        #elevation-div {
+            width: 100%;
+            height: 30vh;
+            background: #111;
         }
         .info {
-            padding: 0.8rem;
+            padding: 0.4rem;
             text-align: center;
-            font-size: 0.9rem;
-            color: #aaa;
+            font-size: 0.8rem;
+            color: #888;
+            background: #0d0d0d;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h2>Ruta Camino de Santiago</h2>
+        <h2>Ruta por España (Satélite + Perfil de Altitud)</h2>
     </header>
 
-    <!-- Div donde se renderizará el mapa -->
+    <!-- Mapa -->
     <div id="map"></div>
     
+    <!-- Gráfico de Elevación -->
+    <div id="elevation-div"></div>
+    
     <div class="info">
-        <p>Mapa vía Esri Satellite.</p>
+        <p>💡 Pasa el ratón sobre el gráfico de abajo para ver la ubicación exacta sobre el mapa de satélite.</p>
     </div>
 
-    <!-- Librerías de Leaflet y Plugin GPX -->
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
+    <!-- Leaflet Elevation JS -->
+    <script src="https://unpkg.com/@raruto/leaflet-elevation@2.5.1/dist/leaflet-elevation.min.js"></script>
 
     <script>
-        // 1. Inicializar el mapa centrado DIRECTAMENTE EN ESPAÑA (Coordenadas aproximadas del centro: Madrid, zoom 6)
-        var map = L.map('map').setView([40.4168, -3.7038], 6);
+        // 1. Inicializar el mapa centrado en España con zoom general inicial
+        var map = L.map('map', {
+            center: [40.4168, -3.7038],
+            zoom: 6,
+            zoomControl: true
+        });
 
-        // 2. Añadir CAPA DE SATÉLITE de alta resolución (Esri World Imagery)
+        // 2. Capa de mapa de satélite de alta resolución (Esri World Imagery)
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 19,
-            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            attribution: 'Tiles &copy; Esri'
         }).addTo(map);
 
-        // 3. Capa adicional opcional con etiquetas de carreteras/ciudades sobre el satélite (Esri Reference Overlay)
+        // Capa de etiquetas de poblaciones y carreteras sobre el satélite
         L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 19
         }).addTo(map);
 
-        // 4. Cargar tu archivo GPX (Asegúrate de subir tu archivo a GitHub con este mismo nombre)
-        var gpxUrl = 'ruta.gpx'; 
-
-        var gpxLayer = new L.GPX(gpxUrl, {
-            async: true,
-            marker_options: {
-                startIcon: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/pin-icon-start.png',
-                endIcon: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/pin-icon-end.png',
-                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/pin-shadow.png'
-            },
-            polyline_options: {
-                color: '#ff0055', // Color fucsia/rojo brillante para que resalte perfectamente sobre el satélite
-                weight: 4,
-                opacity: 0.8
+        // 3. Configurar el control de elevación (idéntico concepto a gpx.studio)
+        var controlElevation = L.control.elevation({
+            theme: "dark-theme",     // Tema oscuro para que combine con el fondo
+            detached: true,          // Separa el gráfico del mapa para colocarlo en su propio div
+            elevationDiv: "#elevation-div", // ID del contenedor HTML creado arriba
+            followMarker: true,      // Sigue el punto en el mapa al interactuar con el gráfico
+            autohide: false,
+            summary: true,           // Muestra totales de distancia y desnivel
+            gpxOptions: {
+                polyline_options: {
+                    color: '#ff0055', // Color fucsia brillante para destacar sobre el satélite
+                    weight: 4,
+                    opacity: 0.85
+                }
             }
-        }).on('loaded', function(e) {
-            // Al cargar la ruta, el mapa hace zoom automáticamente sobre ella (centrándose en tu zona de España)
-            map.fitBounds(e.target.getBounds());
-        }).addTo(map);
+        });
 
+        // Añadir el control de elevación al mapa
+        controlElevation.addTo(map);
+
+        // 4. Cargar automáticamente el archivo GPX (asegúrate de que se llama 'ruta.gpx' en tu repositorio)
+        controlElevation.load("ruta.gpx");
     </script>
 
 </body>
