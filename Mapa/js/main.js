@@ -16,17 +16,25 @@ document.addEventListener("DOMContentLoaded", () => {
         maxZoom: 19
     }).addTo(map);
 
+// 3. Configuración Plugin de Elevación
     const elevationControl = L.control.elevation({
-        theme: "camino-theme",
+        theme: "camino-theme", // Forzado por CSS a Blanco y Negro
         detached: true,
         elevationDiv: "#elevation-div",
         autofitBounds: true,
         displayTrackInfo: false,
         profile: "elevation",
         waypoints: true,
-        polyline: { color: '#ffffff', weight: 4, opacity: 0.9, lineCap: 'round' }
+        polyline: { color: '#ffffff', weight: 4, opacity: 0.9, lineCap: 'round' }, // Línea BLANCA en el mapa
+        
+        // LA SOLUCIÓN AL DESPLAZAMIENTO: Ajustar los márgenes internos de D3.js
+        margins: {
+            top: 20,    // Reducimos el espacio vacío de arriba
+            right: 25, 
+            bottom: 30, // Dejamos espacio para los números del eje X (kilómetros)
+            left: 50    // Dejamos espacio para los números del eje Y (altitud)
+        }
     }).addTo(map);
-
     elevationControl.load("ruta.gpx");
 
     // Lógica de Menús Accesibles
