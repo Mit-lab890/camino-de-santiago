@@ -170,24 +170,32 @@ body, html {
     pointer-events: auto !important; 
 }
 /* =========================================
-   CONTENEDOR DEL GRÁFICO (Corte Solucionado)
+   CONTENEDOR DEL GRÁFICO (Solución al corte)
    ========================================= */
 #elevation-div { 
-    flex-grow: 1; 
     width: 100%;
-    padding: 0 15px 15px 15px; /* Ajustamos el padding */
-    box-sizing: border-box; /* VITAL: Evita que el padding sume altura y corte el gráfico */
+    /* La altura total del panel (28vh o min 220px) menos los 45px de la cabecera */
+    height: calc(100% - 45px); 
+    padding: 0; 
+    margin: 0;
+    box-sizing: border-box; 
+    display: block; /* VITAL: Quitar flexbox para que D3.js mida bien la altura */
     overflow: hidden; 
-    display: flex;
-    align-items: stretch; /* Estira el contenido internamente */
 }
 
-/* Forzar al contenedor inyectado por el plugin a no exceder el tamaño */
+/* Forzar al contenedor inyectado por el plugin a no exceder el tamaño y ser transparente */
 #elevation-div .elevation-control {
     width: 100% !important;
     height: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+    background: transparent !important;
+}
+
+/* Forzar al fondo del gráfico a ser 100% transparente para ver el "glassmorphism" */
+.elevation-control.elevation .background { 
+    fill: transparent !important; 
+    stroke: none !important; 
 }
 
 /* Forzar al lienzo del gráfico (SVG) a encajar perfectamente */
@@ -196,7 +204,6 @@ body, html {
     height: 100% !important;
     display: block;
 }
-
 /* Panel Lateral Etapas (Desktop) */
 .side-panel {
     position: absolute; 
