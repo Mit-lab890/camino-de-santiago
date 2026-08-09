@@ -208,3 +208,44 @@ body, html {
     color: white;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
+/* Estilos para el formulario de Feedback */
+.feedback-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.feedback-form select,
+.feedback-form input,
+.feedback-form textarea {
+    width: 100%;
+    padding: 12px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: white;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.feedback-form select:focus,
+.feedback-form input:focus,
+.feedback-form textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.btn-submit {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-submit:hover {
+    background: #2563eb;
+}
