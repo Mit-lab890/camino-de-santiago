@@ -1,0 +1,210 @@
+/* Variables globales de color */
+:root {
+    --primary: #3b82f6;
+    --bg-dark: #121212;
+    --bg-panel: rgba(30, 30, 30, 0.85);
+    --text-light: #ffffff;
+}
+
+/* Reset y estructura base */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    height: 100%;
+    overflow: hidden;
+    background-color: #000;
+}
+
+/* Mapa a pantalla completa */
+#map {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+/* Título flotante */
+.map-title {
+    position: absolute;
+    top: 20px;
+    left: 50px;
+    z-index: 1000;
+    background: var(--bg-panel);
+    padding: 10px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    backdrop-filter: blur(5px);
+    border: 1px solid #333;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* Barra de herramientas flotante */
+.toolbar {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-tool {
+    background-color: var(--bg-panel);
+    color: var(--text-light);
+    border: 1px solid #333;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.btn-tool:hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    transform: scale(1.05);
+}
+
+/* Panel de Elevación retráctil */
+#elevation-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 35vh;
+    background-color: var(--bg-dark);
+    z-index: 999;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border-top: 2px solid var(--primary);
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+}
+
+#elevation-container.active {
+    transform: translateY(0);
+}
+
+#elevation-div {
+    height: 100%;
+    width: 100%;
+}
+
+/* Botones para cerrar paneles */
+.close-panel-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 1001;
+    transition: color 0.2s;
+}
+
+.close-panel-btn:hover {
+    color: white;
+}
+
+/* Ventana modal del equipo */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.team-modal {
+    background: #1e1e1e;
+    padding: 30px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    color: white;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    border: 1px solid #333;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .team-modal {
+    transform: scale(1);
+}
+
+.team-modal h2 {
+    margin-top: 0;
+    text-align: center;
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.team-member {
+    background: #2a2a2a;
+    padding: 12px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.team-member:hover {
+    background: #333;
+    transform: translateX(5px);
+}
+
+.member-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
