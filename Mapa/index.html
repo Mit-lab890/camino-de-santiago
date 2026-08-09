@@ -57,6 +57,36 @@
             </div>
         </div>
     </div>
+    
+    <!-- Modal de Feedback (Diario del Camino) -->
+    <div class="modal-overlay" id="feedback-overlay">
+    <div class="team-modal">
+        <button class="close-panel-btn" id="close-feedback" style="top: 15px; right: 15px;" title="Cerrar">
+            <i class="fa-solid fa-times"></i>
+        </button>
+        <h2><i class="fa-solid fa-book-open"></i> Diario de Etapa</h2>
+        
+        <form id="form-feedback" class="feedback-form">
+            <select id="fb-autor" required>
+                <option value="" disabled selected>¿Quién eres?</option>
+                <option value="María">María</option>
+                <option value="Mario">Mario</option>
+                <option value="Irene">Irene</option>
+                <option value="Carlota">Carlota</option>
+                <option value="Carmen">Carmen</option>
+                <option value="Santi">Santi</option>
+                <option value="Alejo">Alejo</option>
+                <option value="Andrés">Andrés</option>
+            </select>
+
+            <input type="text" id="fb-etapa" placeholder="Ej: Etapa 3 - Arzúa" required>
+            
+            <textarea id="fb-comentario" placeholder="¿Qué tal fue la etapa de hoy? Anécdotas, dolores, paisajes..." rows="4" required></textarea>
+            
+            <button type="submit" class="btn-submit">Guardar Recuerdo</button>
+        </form>
+    </div>
+</div>
 
     <!-- Librerías Externas JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
