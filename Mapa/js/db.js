@@ -1,18 +1,41 @@
-// Este archivo manejará la base de datos de los comentarios.
-// Más adelante, aquí pegaremos la configuración real de Firebase.
+// Importamos las herramientas de Firebase directamente desde Internet (CDN)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+// Sustituye esto por TU código del Paso 1
 const firebaseConfig = {
-    // API KEY y datos de Firebase irán aquí cuando lo crees
+
+  apiKey: "AIzaSyDvDjfRXM6GBMLZdvPXIyqBYhJn1PXwTZ0",
+
+  authDomain: "caminosantiago-1fd3b.firebaseapp.com",
+
+  projectId: "caminosantiago-1fd3b",
+
+  storageBucket: "caminosantiago-1fd3b.firebasestorage.app",
+
+  messagingSenderId: "478230083546",
+
+  appId: "1:478230083546:web:008c42fafbe66d30fdb2e3",
+
+  measurementId: "G-CPZPRHSR54"
+
 };
 
-// --- Lógica de la Interfaz del Feedback ---
+
+
+// Inicializamos Firebase y la Base de datos
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// --- Lógica de la Interfaz ---
 document.addEventListener('DOMContentLoaded', () => {
     const btnFeedback = document.getElementById('btn-feedback');
     const overlayFeedback = document.getElementById('feedback-overlay');
     const closeFeedback = document.getElementById('close-feedback');
     const formFeedback = document.getElementById('form-feedback');
-
-    // Mostramos el botón de feedback (lo habíamos ocultado en HTML)
+    
+    // El botón original (que pusiste en el index.html) tiene style="display: none;"
+    // Aquí forzamos a que se vea si existe
     if(btnFeedback) {
         btnFeedback.style.display = 'flex';
         btnFeedback.addEventListener('click', () => overlayFeedback.classList.add('active'));
@@ -22,35 +45,47 @@ document.addEventListener('DOMContentLoaded', () => {
         closeFeedback.addEventListener('click', () => overlayFeedback.classList.remove('active'));
     }
 
-    // Cerrar al hacer clic fuera
     if(overlayFeedback) {
         overlayFeedback.addEventListener('click', (e) => {
             if (e.target === overlayFeedback) overlayFeedback.classList.remove('active');
         });
     }
 
-    // Manejar el envío del formulario
+    // CUANDO ALGUIEN LE DA A "GUARDAR RECUERDO"
     if(formFeedback) {
-        formFeedback.addEventListener('submit', (e) => {
-            e.preventDefault(); // Evita que la página se recargue
+        formFeedback.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            
+            // Cambiamos el texto del botón para que parezca que está cargando
+            const btnSubmit = formFeedback.querySelector('.btn-submit');
+            const textoOriginal = btnSubmit.innerText;
+            btnSubmit.innerText = "Guardando...";
+            btnSubmit.disabled = true;
 
             const autor = document.getElementById('fb-autor').value;
             const etapa = document.getElementById('fb-etapa').value;
             const comentario = document.getElementById('fb-comentario').value;
 
-            const nuevoFeedback = {
-                autor: autor,
-                etapa: etapa,
-                comentario: comentario,
-                fecha: new Date().toISOString()
-            };
+            try {
+                // Guardamos los datos en una colección llamada "diario" en Firestore
+                await addDoc(collection(db, "diario"), {
+                    autor: autor,
+                    etapa: etapa,
+                    comentario: comentario,
+                    fecha: new Date().toISOString()
+                });
 
-            // Aquí enviaremos "nuevoFeedback" a Firebase más adelante
-            console.log("Feedback listo para enviar a Base de Datos:", nuevoFeedback);
-            
-            alert("¡Comentario guardado correctamente!");
-            formFeedback.reset();
-            overlayFeedback.classList.remove('active');
+                alert("¡Recuerdo de etapa guardado correctamente!");
+                formFeedback.reset();
+                overlayFeedback.classList.remove('active');
+            } catch (error) {
+                console.error("Error al guardar en Firebase: ", error);
+                alert("Hubo un error al guardar. Revisa la consola.");
+            } finally {
+                // Restauramos el botón
+                btnSubmit.innerText = textoOriginal;
+                btnSubmit.disabled = false;
+            }
         });
     }
 });
