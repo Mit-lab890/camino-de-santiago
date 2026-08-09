@@ -1,225 +1,323 @@
-/* Variables globales de color */
+/* =========================================
+   RESET Y VARIABLES
+   ========================================= */
 :root {
-    --primary: #3b82f6;
-    --bg-dark: #121212;
-    --bg-panel: rgba(30, 30, 30, 0.85);
-    --text-light: #ffffff;
+    --bg-dark: rgba(18, 18, 22, 0.9);
+    --bg-panel: rgba(26, 26, 32, 0.95);
+    --text-main: #f0f0f0;
+    --text-muted: #aaaaaa;
+    --white-elegant: #ffffff;
+    --border-color: rgba(255, 255, 255, 0.15);
+    --focus-ring: 2px solid var(--white-elegant);
 }
 
-/* Reset y estructura base */
 body, html {
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0; 
+    padding: 0; 
     height: 100%;
-    overflow: hidden;
-    background-color: #000;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #000; 
+    overflow: hidden; 
+    color: var(--text-main);
 }
 
-/* Mapa a pantalla completa */
-#map {
-    width: 100vw;
-    height: 100vh;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
+/* Indicadores de foco para navegación por teclado (Accesibilidad) */
+*:focus-visible { 
+    outline: var(--focus-ring); 
+    outline-offset: 3px; 
+    border-radius: 4px; 
 }
 
-/* Título flotante */
-.map-title {
-    position: absolute;
-    top: 20px;
-    left: 50px;
-    z-index: 1000;
-    background: var(--bg-panel);
-    padding: 10px 20px;
-    border-radius: 8px;
-    color: white;
-    font-weight: bold;
-    font-size: 18px;
-    backdrop-filter: blur(5px);
-    border: 1px solid #333;
-    pointer-events: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+/* =========================================
+   MAPA (Bloqueado contra desplazamientos)
+   ========================================= */
+#map { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100vw !important; 
+    height: 100vh !important; 
+    margin: 0 !important; 
+    padding: 0 !important; 
+    z-index: 1; 
 }
 
-/* Barra de herramientas flotante */
-.toolbar {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+/* =========================================
+   UI CONTROLS (Flotantes)
+   ========================================= */
+#ui-container { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    pointer-events: none; 
+    z-index: 1000; 
+    display: flex; 
+    flex-direction: column; 
 }
+
+/* Header UI */
+.top-bar {
+    pointer-events: auto; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding: 12px 20px; 
+    background: var(--bg-dark); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px); 
+    border-bottom: 1px solid var(--border-color);
+}
+
+.logo { 
+    font-size: 1.1rem; 
+    font-weight: 600; 
+    letter-spacing: 1px; 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+}
+
+.logo i { color: #ccc; }
+
+.tools { display: flex; gap: 12px; }
 
 .btn-tool {
-    background-color: var(--bg-panel);
-    color: var(--text-light);
-    border: 1px solid #333;
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 20px;
-    display: flex;
+    background: rgba(255, 255, 255, 0.05); 
+    border: 1px solid var(--border-color);
+    color: var(--text-main); 
+    width: 44px; 
+    height: 44px; 
+    border-radius: 8px; /* 44x44px Touch Target Mínimo */
+    cursor: pointer; 
+    transition: all 0.2s ease; 
+    font-size: 1.1rem;
+    display: flex; 
+    justify-content: center; 
     align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(5px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
-.btn-tool:hover {
-    background-color: var(--primary);
-    border-color: var(--primary);
-    transform: scale(1.05);
+.btn-tool:hover, .btn-tool.active { 
+    background: var(--white-elegant); 
+    color: #000; 
+    border-color: var(--white-elegant); 
 }
 
-/* Panel de Elevación retráctil */
-#elevation-container {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 35vh;
-    background-color: var(--bg-dark);
-    z-index: 999;
-    transform: translateY(100%);
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    border-top: 2px solid var(--primary);
-    box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+/* Headers de Paneles */
+.panel-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding: 12px 20px; 
+    border-bottom: 1px solid var(--border-color);
 }
 
-#elevation-container.active {
-    transform: translateY(0);
+.panel-title { 
+    margin: 0; 
+    font-size: 0.85rem; 
+    font-weight: 500; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
 }
 
-#elevation-div {
+.btn-close { 
+    background: none; 
+    border: none; 
+    color: #888; 
+    font-size: 1.2rem; 
+    padding: 5px; 
+    cursor: pointer; 
+    transition: color 0.2s; 
+}
+
+.btn-close:hover { color: #fff; }
+
+/* =========================================
+   PANELES FLOTANTES RESPONSIVE (Cero tirones)
+   ========================================= */
+
+/* Panel Inferior Elevación */
+.bottom-panel {
+    background: var(--bg-panel); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color); 
+    border-radius: 16px; 
+    position: absolute; 
+    bottom: 20px; 
+    left: 20px; 
+    right: 20px; 
+    width: calc(100% - 40px); 
+    height: 28vh; 
+    min-height: 220px;
+    display: flex; 
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    
+    /* LA SOLUCIÓN: Sacarlo 150% de la pantalla hacia abajo y matar todos sus eventos */
+    opacity: 0; 
+    visibility: hidden; 
+    transform: translateY(150%); 
+    pointer-events: none !important;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+}
+
+.bottom-panel.active { 
+    opacity: 1; 
+    visibility: visible; 
+    transform: translateY(0); 
+    pointer-events: auto !important; 
+}
+
+#elevation-div { 
+    flex-grow: 1; 
+    padding: 5px 15px 15px 15px; 
+    overflow: hidden; 
     height: 100%;
-    width: 100%;
 }
 
-/* Botones para cerrar paneles */
-.close-panel-btn {
-    position: absolute;
-    top: 10px;
+/* Panel Lateral Etapas (Desktop) */
+.side-panel {
+    position: absolute; 
+    top: 80px; 
     right: 20px;
-    background: none;
-    border: none;
-    color: #aaa;
-    font-size: 24px;
-    cursor: pointer;
-    z-index: 1001;
-    transition: color 0.2s;
-}
-
-.close-panel-btn:hover {
-    color: white;
-}
-
-/* Ventana modal del equipo */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
-    z-index: 2000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-}
-
-.modal-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.team-modal {
-    background: #1e1e1e;
-    padding: 30px;
+    width: 320px; 
+    max-height: calc(100vh - 110px); 
+    background: var(--bg-panel);
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px); 
+    border: 1px solid var(--border-color); 
     border-radius: 16px;
-    width: 90%;
-    max-width: 500px;
-    color: white;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-    border: 1px solid #333;
-    position: relative;
-    transform: scale(0.95);
-    transition: transform 0.3s ease;
+    display: flex; 
+    flex-direction: column; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    
+    /* LA SOLUCIÓN: Sacarlo 150% de la pantalla hacia la derecha y matar todos sus eventos */
+    opacity: 0; 
+    visibility: hidden; 
+    transform: translateX(150%);
+    pointer-events: none !important;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
 }
 
-.modal-overlay.active .team-modal {
-    transform: scale(1);
+.side-panel.active { 
+    opacity: 1; 
+    visibility: visible; 
+    transform: translateX(0); 
+    pointer-events: auto !important; 
 }
 
-.team-modal h2 {
-    margin-top: 0;
-    text-align: center;
-    color: var(--primary);
-    font-weight: 600;
-    margin-bottom: 25px;
-    display: flex;
+.stages-content { 
+    padding: 15px; 
+    overflow-y: auto; 
+    outline: none; 
+}
+
+.stage-card {
+    background: rgba(255,255,255,0.04); 
+    border: 1px solid var(--border-color);
+    padding: 12px; 
+    border-radius: 8px; 
+    margin-bottom: 12px;
+}
+
+.stage-card h4 { 
+    margin: 0 0 8px 0; 
+    font-size: 0.95rem; 
+    color: var(--white-elegant); 
+}
+
+.stage-card p { 
+    margin: 0; 
+    font-size: 0.85rem; 
+    color: var(--text-muted); 
+    display: flex; 
+    justify-content: space-between; 
+}
+
+/* MEDIA QUERIES (Mobile y Tablets pequeñas) */
+@media (max-width: 768px) {
+    .side-panel { 
+        top: auto; 
+        bottom: 20px; 
+        left: 20px; 
+        right: 20px; 
+        width: calc(100% - 40px); 
+        height: 60vh; 
+        transform: translateY(150%); /* En móvil se saca por debajo de la pantalla */
+    }
+    .side-panel.active { 
+        transform: translateY(0); 
+    }
+}
+
+/* =========================================
+   MARKERS OVERPASS API (Sitios de interés)
+   ========================================= */
+.poi-marker {
+    background: #000000; 
+    border: 2px solid #ffffff; /* Borde blanco elegante */
+    color: #ffffff;
+    border-radius: 50%; 
+    width: 28px; 
+    height: 28px; 
+    display: flex; 
+    justify-content: center; 
     align-items: center;
-    justify-content: center;
-    gap: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.4); 
+    font-size: 13px;
 }
 
-.team-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+.leaflet-popup-content-wrapper { 
+    background: rgba(15, 15, 15, 0.95); 
+    color: #ffffff; 
+    border: 1px solid #ffffff; 
+    border-radius: 8px; 
 }
 
-.team-member {
-    background: #2a2a2a;
-    padding: 12px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-weight: 500;
-    transition: background 0.2s, transform 0.2s;
+.leaflet-popup-tip { 
+    background: rgba(15, 15, 15, 0.95); 
+    border-right: 1px solid #ffffff; 
+    border-bottom: 1px solid #ffffff; 
 }
 
-.team-member:hover {
-    background: #333;
-    transform: translateX(5px);
+/* =========================================
+   PERFIL DE ELEVACIÓN: BLANCO Y NEGRO
+   ========================================= */
+/* Ocultar botones de cerrar y expandir propios del plugin para dejar solo TU botón */
+.elevation-control .leaflet-control-elevation-close,
+.elevation-control .elevation-toggle-icon { 
+    display: none !important; 
 }
 
-.member-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 16px;
-    color: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+/* Gráfico Blanco Elegante */
+.elevation-control.elevation path.area { 
+    fill: rgba(255, 255, 255, 0.15) !important; /* Fondo blanco translúcido */
+    stroke: none !important; 
 }
 
-.btn-submit {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
+.elevation-control.elevation path.line { 
+    stroke: #ffffff !important; /* Línea de la montaña en BLANCO puro */
+    stroke-width: 2.5 !important; 
 }
 
-.btn-submit:hover {
-    background: #2563eb;
+.elevation-control.elevation .axis path,
+.elevation-control.elevation .axis line { 
+    stroke: rgba(255, 255, 255, 0.3) !important; 
+}
+
+.elevation-control.elevation .axis text { 
+    fill: #dddddd !important; 
+    font-family: inherit !important; 
+}
+
+.elevation-control.elevation .grid .tick line { 
+    stroke: rgba(255, 255, 255, 0.1) !important; 
+}
+
+.elevation-tooltip { 
+    background: rgba(0, 0, 0, 0.9) !important; 
+    border: 1px solid #ffffff !important; 
+    color: #ffffff !important; 
 }

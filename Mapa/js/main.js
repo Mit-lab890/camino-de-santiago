@@ -1,102 +1,186 @@
-// --- 1. CONFIGURACIÓN DEL MAPA ---
-var map = L.map('map', {
-    center: [42.5, -8.0], // Centro aproximado (Galicia)
-    zoom: 8,
-    zoomControl: false
-});
+document.addEventListener("DOMContentLoaded", () => {
 
-// Control de zoom en la esquina inferior derecha
-L.control.zoom({ position: 'bottomright' }).addTo(map);
+    const map = L.map('map', {
+        zoomControl: false,
+        center: [42.15, -8.75],
+        zoom: 10
+    });
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-// Capa de Satélite (Esri)
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 19,
-    attribution: 'Tiles &copy; Esri'
-}).addTo(map);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri',
+        maxZoom: 19
+    }).addTo(map);
 
-// Capa de etiquetas de poblaciones
-L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 19
-}).addTo(map);
+    L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19
+    }).addTo(map);
 
-// --- 2. CONFIGURACIÓN DE LA ELEVACIÓN ---
-var controlElevation = L.control.elevation({
-    theme: "dark-theme",
-    detached: true,
-    elevationDiv: "#elevation-div",
-    followMarker: true,
-    autohide: false,
-    summary: true,
-    legend: false,
-    waypoints: true,
-    trk: true,
-    pts: false,
-    gpxOptions: {
-        polyline_options: {
-            weight: 5,
-            color: '#3b82f6',
-            opacity: 0.9,
-            lineCap: 'round',
-            lineJoin: 'round'
-        },
-        marker_options: {
-            startIcon: null,
-            endIcon: null,
-            point_icon: null,
-            wptIcon: L.divIcon({
-                className: 'custom-waypoint',
-                html: '<div style="background-color: #ffaa00; width: 14px; height: 14px; border: 2px solid #ffffff; border-radius: 50%; box-shadow: 0 0 6px rgba(0,0,0,0.7);"></div>',
-                iconSize: [14, 14],
-                iconAnchor: [7, 7]
-            })
+    const elevationControl = L.control.elevation({
+        theme: "camino-theme",
+        detached: true,
+        elevationDiv: "#elevation-div",
+        autofitBounds: true,
+        displayTrackInfo: false,
+        profile: "elevation",
+        waypoints: true,
+        polyline: { color: '#ffffff', weight: 4, opacity: 0.9, lineCap: 'round' }
+    }).addTo(map);
+
+    elevationControl.load("ruta.gpx");
+
+    // Lógica de Menús Accesibles
+    const btnElevation = document.getElementById('btn-elevation');
+    const panelElevation = document.getElementById('elevation-panel');
+    const btnCloseElevation = document.getElementById('close-elevation');
+
+    const btnStages = document.getElementById('btn-stages');
+    const panelStages = document.getElementById('stages-panel');
+    const btnCloseStages = document.querySelector('.close-stages');
+
+const togglePanel = (btn, panel) => {
+        const isActive = panel.classList.contains('active');
+        const newState = !isActive;
+        
+        panel.classList.toggle('active', newState);
+        btn.classList.toggle('active', newState);
+        
+        // Atributos de Accesibilidad
+        btn.setAttribute('aria-expanded', newState);
+        panel.setAttribute('aria-hidden', !newState);
+        
+        if (newState) {
+            const closeBtn = panel.querySelector('.btn-close');
+            if (closeBtn) closeBtn.focus();
         }
+        
+        // ¡Se ha eliminado el recalculo del gráfico aquí para garantizar cero tirones!
+    };
+
+    btnElevation.addEventListener('click', () => togglePanel(btnElevation, panelElevation));
+    btnCloseElevation.addEventListener('click', () => togglePanel(btnElevation, panelElevation));
+
+    btnStages.addEventListener('click', () => togglePanel(btnStages, panelStages));
+    btnCloseStages.addEventListener('click', () => togglePanel(btnStages, panelStages));
+
+    // Motor de Etapas
+    elevationControl.on('eledata_loaded', function (e) {
+        fetch('ruta.gpx').then(res => res.text()).then(xmlStr => {
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(xmlStr, "application/xml");
+
+            const trkpts = Array.from(xml.querySelectorAll('trkpt'));
+            let trackCoords = [];
+            let cumulativeDist = 0;
+
+            for (let i = 0; i < trkpts.length; i++) {
+                let currentP = L.latLng(trkpts[i].getAttribute('lat'), trkpts[i].getAttribute('lon'));
+                if (i > 0) {
+                    let prevP = L.latLng(trkpts[i - 1].getAttribute('lat'), trkpts[i - 1].getAttribute('lon'));
+                    cumulativeDist += prevP.distanceTo(currentP);
+                }
+                trackCoords.push({ point: currentP, dist: cumulativeDist });
+            }
+
+            const wpts = Array.from(xml.querySelectorAll('wpt'));
+            let stagesData = [];
+
+            wpts.forEach(wpt => {
+                let wpLatLng = L.latLng(wpt.getAttribute('lat'), wpt.getAttribute('lon'));
+                let name = wpt.querySelector('name').textContent;
+                let minDist = Infinity;
+                let trackDistAtWp = 0;
+
+                trackCoords.forEach(t => {
+                    let d = wpLatLng.distanceTo(t.point);
+                    if (d < minDist) {
+                        minDist = d;
+                        trackDistAtWp = t.dist;
+                    }
+                });
+                stagesData.push({ name: name, routeDist: trackDistAtWp });
+            });
+
+            stagesData.sort((a, b) => a.routeDist - b.routeDist);
+
+            let html = '';
+            for (let i = 0; i < stagesData.length - 1; i++) {
+                let distMeters = stagesData[i + 1].routeDist - stagesData[i].routeDist;
+                let distKm = (distMeters / 1000).toFixed(2);
+                let timeHours = distKm / 4;
+                let h = Math.floor(timeHours);
+                let m = Math.round((timeHours - h) * 60);
+
+                html += `
+                    <article class="stage-card" tabindex="0">
+                        <h4>Etapa ${i + 1}</h4>
+                        <p style="color:#fff; margin-bottom: 8px;">${stagesData[i].name} <br> a <br> ${stagesData[i + 1].name}</p>
+                        <p><span><i class="fa-solid fa-route" aria-hidden="true"></i> ${distKm} km</span> <span><i class="fa-regular fa-clock" aria-hidden="true"></i> ${h}h ${m}m</span></p>
+                    </article>
+                `;
+            }
+            document.getElementById('stages-content').innerHTML = html;
+        });
+    });
+
+    // Puntos de Interés
+    const poiLayer = L.featureGroup().addTo(map);
+    const cachedPOIs = new Set();
+    let fetchTimer;
+
+    map.on('moveend', () => {
+        if (map.getZoom() < 12) {
+            poiLayer.clearLayers();
+            cachedPOIs.clear();
+            return;
+        }
+        clearTimeout(fetchTimer);
+        fetchTimer = setTimeout(fetchPOIs, 800);
+    });
+
+    function fetchPOIs() {
+        const bounds = map.getBounds();
+        const bbox = `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`;
+
+        const query = `
+            [out:json][timeout:15];
+            (
+                node["amenity"~"restaurant|cafe|drinking_water|place_of_worship"](${bbox});
+                node["shop"~"supermarket|convenience"](${bbox});
+                node["tourism"~"hostel|hotel|guest_house"](${bbox});
+                node["historic"~"monument"](${bbox});
+            );
+            out body;
+        `;
+
+        fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => {
+                data.elements.forEach(node => {
+                    if (!cachedPOIs.has(node.id)) {
+                        cachedPOIs.add(node.id);
+                        let iconClass = 'fa-map-marker';
+                        const t = node.tags;
+                        const type = t.amenity || t.shop || t.tourism || t.historic || 'Punto';
+
+                        if (['restaurant', 'cafe'].includes(type)) iconClass = 'fa-utensils';
+                        if (['supermarket', 'convenience'].includes(type)) iconClass = 'fa-shopping-basket';
+                        if (type === 'drinking_water') iconClass = 'fa-faucet-drip';
+                        if (['place_of_worship', 'monument'].includes(type)) iconClass = 'fa-church';
+                        if (['hostel', 'hotel', 'guest_house'].includes(type)) iconClass = 'fa-bed';
+
+                        const customIcon = L.divIcon({
+                            html: `<div class="poi-marker"><i class="fa-solid ${iconClass}" aria-hidden="true"></i></div>`,
+                            className: '',
+                            iconSize: [28, 28]
+                        });
+
+                        L.marker([node.lat, node.lon], { icon: customIcon, alt: t.name || 'Punto de interés' })
+                            .bindPopup(`<b>${t.name || 'Lugar sin nombre'}</b><br><small style="color:#aaa; text-transform:capitalize;">${type.replace('_', ' ')}</small>`)
+                            .addTo(poiLayer);
+                    }
+                });
+            })
+            .catch(err => console.log("Llamada pausada."));
     }
-});
-
-controlElevation.addTo(map);
-
-// Cargar el archivo GPX (Asegúrate de que la ruta coincida con tu carpeta)
-controlElevation.load("data/ruta.gpx");
-
-// --- 3. LÓGICA DE INTERFAZ (BOTONES) ---
-const btnElevation = document.getElementById('btn-elevation');
-const containerElevation = document.getElementById('elevation-container');
-const closeElevation = document.getElementById('close-elevation');
-
-const btnTeam = document.getElementById('btn-team');
-const overlayTeam = document.getElementById('team-overlay');
-const closeTeam = document.getElementById('close-team');
-
-// Toggle Elevación
-btnElevation.addEventListener('click', () => {
-    containerElevation.classList.toggle('active');
-    setTimeout(() => {
-        window.dispatchEvent(new Event('resize'));
-    }, 400);
-});
-closeElevation.addEventListener('click', () => containerElevation.classList.remove('active'));
-
-// Toggle Equipo
-btnTeam.addEventListener('click', () => overlayTeam.classList.add('active'));
-closeTeam.addEventListener('click', () => overlayTeam.classList.remove('active'));
-overlayTeam.addEventListener('click', (e) => {
-    if (e.target === overlayTeam) overlayTeam.classList.remove('active');
-});
-
-// --- 4. GENERAR LOS INTEGRANTES DINÁMICAMENTE ---
-const integrantes = ["María", "Mario", "Irene", "Carlota", "Carmen", "Santi", "Alejo", "Andrés"];
-const gridTeam = document.getElementById('team-grid');
-const colores = ['#ef4444', '#f97316', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f43f5e'];
-
-integrantes.forEach((nombre, index) => {
-    const inicial = nombre.charAt(0);
-    const colorFondo = colores[index % colores.length];
-    
-    const htmlMiembro = `
-        <div class="team-member">
-            <div class="member-avatar" style="background-color: ${colorFondo};">${inicial}</div>
-            <span>${nombre}</span>
-        </div>
-    `;
-    gridTeam.innerHTML += htmlMiembro;
 });

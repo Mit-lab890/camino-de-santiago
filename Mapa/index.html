@@ -1,65 +1,73 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camino de Santiago 2026</title>
-    
-    <!-- Librerías Externas CSS (Leaflet y FontAwesome) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Camino de Santiago 2026 - Studio</title>
+
+    <!-- Librerías Externas -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/@raruto/leaflet-elevation@2.5.1/dist/leaflet-elevation.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    
-    <!-- Tus Estilos -->
+
+    <!-- Estilo Principal -->
     <link rel="stylesheet" href="css/styles.css" />
 </head>
+
 <body>
+    <!-- Capa del mapa base -->
+    <main id="map" role="application" aria-label="Mapa interactivo del Camino de Santiago"></main>
 
-    <!-- Título flotante -->
-    <div class="map-title">
-        <i class="fa-solid fa-route"></i> Camino de Santiago 2026
-    </div>
-
-    <!-- Mapa a pantalla completa -->
-    <div id="map"></div>
-    
-    <!-- Botones flotantes -->
-    <div class="toolbar">
-        <button class="btn-tool" id="btn-elevation" title="Ver Perfil de Elevación">
-            <i class="fa-solid fa-chart-area"></i>
-        </button>
-        <button class="btn-tool" id="btn-team" title="Ver Integrantes">
-            <i class="fa-solid fa-users"></i>
-        </button>
-    </div>
-
-    <!-- Panel Retráctil de Elevación -->
-    <div id="elevation-container">
-        <button class="close-panel-btn" id="close-elevation" title="Cerrar">
-            <i class="fa-solid fa-times"></i>
-        </button>
-        <div id="elevation-div"></div>
-    </div>
-
-    <!-- Modal de Integrantes -->
-    <div class="modal-overlay" id="team-overlay">
-        <div class="team-modal">
-            <button class="close-panel-btn" id="close-team" style="top: 15px; right: 15px;" title="Cerrar">
-                <i class="fa-solid fa-times"></i>
-            </button>
-            <h2><i class="fa-solid fa-shoe-prints"></i> Los 8 Peregrinos</h2>
-            <div class="team-grid" id="team-grid">
-                <!-- Se rellena automáticamente por JavaScript -->
+    <!-- UI Flotante -->
+    <div id="ui-container">
+        <!-- Cabecera Top -->
+        <header class="top-bar">
+            <div class="logo" aria-hidden="true">
+                <i class="fa-solid fa-moon"></i>
+                <span>Camino 2026</span>
             </div>
-        </div>
+            <nav class="tools" aria-label="Herramientas del mapa">
+                <button class="btn-tool" id="btn-stages" aria-expanded="false" aria-controls="stages-panel"
+                    aria-label="Abrir panel de 6 etapas">
+                    <i class="fa-solid fa-list-ol" aria-hidden="true"></i>
+                </button>
+                <button class="btn-tool" id="btn-elevation" aria-expanded="false" aria-controls="elevation-panel"
+                    aria-label="Abrir panel de elevación">
+                    <i class="fa-solid fa-chart-area" aria-hidden="true"></i>
+                </button>
+            </nav>
+        </header>
+
+        <!-- Panel de Etapas -->
+        <section id="stages-panel" class="side-panel" aria-labelledby="stages-title" aria-hidden="true">
+            <header class="panel-header">
+                <h2 class="panel-title" id="stages-title"><i class="fa-solid fa-route" aria-hidden="true"></i> Las 6
+                    Etapas</h2>
+                <button class="btn-close close-stages" aria-label="Cerrar panel de etapas"><i class="fa-solid fa-times"
+                        aria-hidden="true"></i></button>
+            </header>
+            <div class="stages-content" id="stages-content" tabindex="0">
+                <p style="text-align:center; color:#888; font-size:13px;">Calculando etapas desde el GPX...</p>
+            </div>
+        </section>
+
+        <!-- Panel de Elevación -->
+        <section id="elevation-panel" class="bottom-panel" aria-labelledby="elevation-title" aria-hidden="true">
+            <header class="panel-header">
+                <h2 class="panel-title" id="elevation-title"><i class="fa-solid fa-mountain" aria-hidden="true"></i>
+                    Altimetría</h2>
+                <button class="btn-close" id="close-elevation" aria-label="Cerrar panel de altimetría"><i
+                        class="fa-solid fa-times" aria-hidden="true"></i></button>
+            </header>
+            <div id="elevation-div" tabindex="0"></div>
+        </section>
     </div>
 
-    <!-- Librerías Externas JS -->
+    <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/@raruto/leaflet-elevation@2.5.1/dist/leaflet-elevation.min.js"></script>
-
-    <!-- Tus Scripts -->
     <script src="js/main.js"></script>
-    
 </body>
+
 </html>
