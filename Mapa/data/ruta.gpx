@@ -1,41 +1,41 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<gpx version="1.1" creator="https://www.komoot.de" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+<gpx version="1.1" creator="Mit" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
   <metadata>
     <name>Camino de Santiago</name>
     <author>
-      <link href="https://www.komoot.de">
-        <text>komoot</text>
+      <link href="https://mit-lab890.github.io/camino-de-santiago/Mapa/">
+        <text>Mit</text>
         <type>text/html</type>
       </link>
     </author>
   </metadata>
   <wpt lat="41.950082" lon="-8.883346">
     <name>Hotel Vila de Guarda</name>
-    <sym>Flag, Blue</sym>
+    <sym>Flag, Black</sym>
   </wpt>
   <wpt lat="42.121501" lon="-8.852588">
     <name>Albuergue Estela Do Mar</name>
-    <sym>Flag, Blue</sym>
+    <sym>Flag, Black</sym>
   </wpt>
   <wpt lat="42.238157" lon="-8.719199">
     <name>Pension Residencia Buenos Aire</name>
-    <sym>Flag, Blue</sym>
+    <sym>Flag, Black</sym>
   </wpt>
   <wpt lat="42.332096" lon="-8.607072">
     <name>Albuergue A filla do Mar</name>
-    <sym>Flag, Blue</sym>
+    <sym>Flag, Black</sym>
   </wpt>
   <wpt lat="42.545016" lon="-8.636972">
     <name>Lar Do Pazo</name>
-    <sym>Flag, Blue</sym>
+    <sym>Flag, Black</sym>
   </wpt>
   <wpt lat="42.800401" lon="-8.634618">
     <name>Pension Rural Areal</name>
-    <sym>Flag, Blue</sym>
+    <sym>Flag, Black</sym>
   </wpt>
   <wpt lat="42.880302" lon="-8.545521">
     <name>Santiago de Compostela Cathedral</name>
-    <sym>Flag, Blue</sym>
+    <sym>Flag, Black</sym>
   </wpt>
   <trk>
     <name>Camino de Santiago</name>
