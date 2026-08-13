@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
             left: 50    // Dejamos espacio para los números del eje Y (altitud)
         }
     }).addTo(map);
-    elevationControl.load("data/ruta.gpx");
+    elevationControl.load("ruta.gpx");
 
     // Lógica de Menús Accesibles
     const btnElevation = document.getElementById('btn-elevation');
@@ -73,7 +73,7 @@ const togglePanel = (btn, panel) => {
 
     // Motor de Etapas
     elevationControl.on('eledata_loaded', function (e) {
-        fetch('data/ruta.gpx').then(res => res.text()).then(xmlStr => {
+        fetch('ruta.gpx').then(res => res.text()).then(xmlStr => {
             const parser = new DOMParser();
             const xml = parser.parseFromString(xmlStr, "application/xml");
 
